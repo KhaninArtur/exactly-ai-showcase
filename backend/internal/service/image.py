@@ -15,11 +15,15 @@ from internal.settings import settings
 
 logger = get_logger()
 
+last_retrieve_at: datetime = datetime.utcnow()
+
 
 def retrieve_image(db: Session):
+    global last_retrieve_at
     image_data = _fetch_image_data()
     image_id = _save_image_to_cloud(image_data)
     _create_image_record(db, image_id)
+    last_retrieve_at = datetime.utcnow()
 
 
 def _fetch_image_data():
@@ -55,7 +59,7 @@ def _create_image_record(db: Session, image_id: str):
 
 def get_latest_images(
     db: Session, after: datetime | None = None, limit: int | None = None
-) -> tuple[list[Type[Image]], int]:
+) -> tuple[list[Type[Image]], int, datetime]:
     logger.debug("Getting latest images from the database")
     try:
         images = db_image.get_latest_images(db, after, limit)
@@ -63,4 +67,4 @@ def get_latest_images(
     except Exception as e:
         logger.exception("Error fetching images")
         raise DBException(detail=str(e))
-    return images, total_images
+    return images, total_images, last_retrieve_at

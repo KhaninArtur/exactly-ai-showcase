@@ -21,6 +21,7 @@ class ImageResponse(BaseModel):
 class ImagesResponse(BaseModel):
     images: list[ImageResponse]
     total_images: int
+    last_retrieve_at: datetime
 
 
 router = APIRouter()
@@ -35,8 +36,12 @@ async def get_images(
 ) -> ImagesResponse:
     logger.info(f"Fetching images with after={after} and limit={limit}")
     try:
-        images_list, total_images = image_service.get_latest_images(db, after, limit)
+        images_list, total_images, last_retrieve_at = image_service.get_latest_images(
+            db, after, limit
+        )
     except Exception as e:
         logger.error(f"Failed to get images: {str(e)}")
         raise HTTPException(status_code=500, detail="Something went wrong")
-    return ImagesResponse(images=images_list, total_images=total_images)
+    return ImagesResponse(
+        images=images_list, total_images=total_images, last_retrieve_at=last_retrieve_at
+    )
