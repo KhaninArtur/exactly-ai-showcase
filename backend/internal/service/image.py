@@ -58,11 +58,11 @@ def _create_image_record(db: Session, image_id: str):
 
 
 def get_latest_images(
-    db: Session, after: datetime | None = None, limit: int | None = None
+    db: Session, limit: int | None = None
 ) -> tuple[list[Type[Image]], int, datetime]:
     logger.debug("Getting latest images from the database")
     try:
-        images = db_image.get_latest_images(db, after, limit)
+        images = db_image.get_latest_images(db, limit)
         total_images = db_image.get_total_images(db)
     except Exception as e:
         logger.exception("Error fetching images")

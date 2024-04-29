@@ -31,13 +31,12 @@ logger = get_logger()
 @router.get("/images")
 async def get_images(
     db: Session = Depends(get_db),
-    after: datetime = Query(None, alias="after"),
     limit: int = Query(settings.images_limit, ge=1, le=100),
 ) -> ImagesResponse:
-    logger.info(f"Fetching images with after={after} and limit={limit}")
+    logger.info(f"Fetching images with limit={limit}")
     try:
         images_list, total_images, last_retrieve_at = image_service.get_latest_images(
-            db, after, limit
+            db, limit
         )
     except Exception as e:
         logger.error(f"Failed to get images: {str(e)}")

@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from api.image import router as image_router
 from internal import worker
@@ -24,16 +24,18 @@ async def lifespan(app: FastAPI):
 app = FastAPI(debug=settings.debug, lifespan=lifespan)
 app.include_router(image_router)
 
-# TODO: add this middleware only if it's local deployment
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173"
-    ],  # Specify the origins that are allowed to make requests
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
-)
+if settings.local:
+    from fastapi.middleware.cors import CORSMiddleware
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:5173"],
+        allow_credentials=True,
+        allow_methods=["*"],  # Allows all methods
+        allow_headers=["*"],  # Allows all headers
+    )
+else:
+    app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 if __name__ == "__main__":
     uvicorn.run(app, access_log=False)

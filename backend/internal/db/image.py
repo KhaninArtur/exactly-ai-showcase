@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Type
 
 from sqlalchemy import desc
@@ -15,12 +14,8 @@ def create_image(db: Session, image_id: str) -> Image:
     return image
 
 
-def get_latest_images(
-    db: Session, after: datetime | None = None, limit: int | None = None
-) -> list[Type[Image]]:
+def get_latest_images(db: Session, limit: int | None = None) -> list[Type[Image]]:
     query = db.query(Image).order_by(desc(Image.created_at))
-    if after is not None:
-        query = query.filter(Image.created_at >= after)
     if limit is not None:
         query = query.limit(limit)
     return query.all()
