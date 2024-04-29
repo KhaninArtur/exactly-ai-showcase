@@ -13,6 +13,12 @@ RUN npm install
 # Copy frontend source code
 COPY frontend/ .
 
+# Set the environment variables needed for the build
+ARG PUBLIC_API_URL
+ARG PUBLIC_STORAGE_BASE_URL
+ENV PUBLIC_API_URL=$PUBLIC_API_URL
+ENV PUBLIC_STORAGE_BASE_URL=$PUBLIC_STORAGE_BASE_URL
+
 # Build static files
 RUN npm run build
 
