@@ -14,6 +14,9 @@ from internal.settings import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Context manager that sets up and tears down resources on application start and finish.
+    """
     create_database()
     setup_logging()
     task = asyncio.create_task(worker.run())

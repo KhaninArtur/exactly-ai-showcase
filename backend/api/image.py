@@ -34,6 +34,9 @@ async def get_images(
     db: Session = Depends(get_db),
     limit: int = Query(settings.images_limit, ge=1, le=100),
 ) -> ImagesResponse:
+    """
+    Fetches the latest images up to a specified limit and returns them in categorized lists.
+    """
     logger.info(f"Fetching images with limit={limit}")
     try:
         (

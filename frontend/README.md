@@ -1,4 +1,4 @@
-# CatDog🐾 Image Gallery
+# CatDog🐾 Image Gallery Frontend
 
 This project is built with SvelteKit, leveraging [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte) to streamline the setup. It showcases a dynamic image gallery of cats and dogs, fetched from an API.
 

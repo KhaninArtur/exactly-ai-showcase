@@ -28,7 +28,7 @@ def retrieve_image(db: Session):
     last_retrieve_at = datetime.utcnow()
 
 
-def _fetch_image_data():
+def _fetch_image_data() -> bytes:
     logger.debug("Fetching image data from external API")
     try:
         response = requests.post(settings.exactly_api)
@@ -39,7 +39,7 @@ def _fetch_image_data():
         raise ExternalAPIException(detail=str(e))
 
 
-def _save_image_to_cloud(image_data):
+def _save_image_to_cloud(image_data) -> str:
     logger.debug("Saving image data to cloud")
     try:
         image_id = uuid.uuid4().hex
