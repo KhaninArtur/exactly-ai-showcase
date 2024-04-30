@@ -30,4 +30,6 @@ Several enhancements are recommended to increase the robustness and scalability 
   
 - **Database Upgrade**: Replace the SQLite database with a more robust solution like PostgreSQL or Cloud SQL to enhance performance and scalability under heavier loads and to provide better support for concurrent transactions.
 
+- **Increasing Test Coverage**: Enhance the reliability and maintainability of the system by increasing the test coverage. Add integration tests to ensure that different system components work well together as expected. Finally, incorporate end-to-end tests to simulate user interactions and validate the complete flow of the application from start to finish.
+
 These improvements aim to optimize the service for larger scale deployments and enhance overall reliability and maintainability.

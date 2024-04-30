@@ -19,9 +19,12 @@ async def lifespan(app: FastAPI):
     """
     create_database()
     setup_logging()
-    task = asyncio.create_task(worker.run())
-    yield
-    task.cancel()
+    if not settings.test_mode:
+        task = asyncio.create_task(worker.run())
+        yield
+        task.cancel()
+    else:
+        yield
 
 
 app = FastAPI(debug=settings.debug, lifespan=lifespan)

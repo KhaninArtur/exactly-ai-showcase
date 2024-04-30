@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     gcs_service_account_key_base64: str
     gs_bucket_name: str
 
+    test_mode: bool = False
+
     model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", extra="ignore")
 
 
