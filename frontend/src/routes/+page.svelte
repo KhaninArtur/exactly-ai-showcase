@@ -10,12 +10,14 @@
 	}
 
 	interface ImagesResponse {
-		images: Image[];
+		cat_images: Image[];
+		dog_images: Image[];
 		total_images: number;
 		last_retrieve_at: string; // UTC timestamp
 	}
 
-	let images: Image[] = [];
+	let cat_images: Image[] = [];
+	let dog_images: Image[] = [];
 	let totalImages: number = 0;
 	let errorMessage = writable('');
 	let nextRequestIn = 0;
@@ -24,18 +26,14 @@
 
 	async function fetchImages(): Promise<void> {
 		requestInProgress = true;
-		let url = `${PUBLIC_API_URL}/images`; // Default URL
-		if (images.length > 0 && images[0].created_at) {
-			const latestTimestamp = images[0].created_at;
-			url += `?after=${encodeURIComponent(latestTimestamp)}`;
-		}
 		try {
-			const response = await fetch(url);
+			const response = await fetch(`${PUBLIC_API_URL}/images`);
 			if (!response.ok) {
 				throw new Error('Network response was not ok');
 			}
 			const data: ImagesResponse = await response.json();
-			images = data.images;
+			cat_images = data.cat_images;
+			dog_images = data.dog_images;
 			totalImages = data.total_images;
 			errorMessage.set(''); // Clear error message on successful fetch
 			scheduleNextFetch(data.last_retrieve_at);
@@ -78,12 +76,24 @@
 {/if}
 
 <div class="flex justify-center overflow-auto">
-	<div class="container grid grid-cols-2">
-		{#each images as image}
-			<div>
-				<img src="{PUBLIC_STORAGE_BASE_URL}/{image.id}" alt="Image {image.id}" class="image" />
-				<p>{new Date(image.created_at + 'Z').toLocaleString()}</p>
-			</div>
-		{/each}
+	<div class="container grid grid-cols-2 gap-2">
+		<div class="flex flex-col gap-2">
+			<p class="text-lg text-center">Cats</p>
+			{#each cat_images as image, index}
+				<div>
+					<img src="{PUBLIC_STORAGE_BASE_URL}/{image.id}" alt="Cat image {index}" class="image" />
+					<p>{new Date(image.created_at + 'Z').toLocaleString()}</p>
+				</div>
+			{/each}
+		</div>
+		<div class="flex flex-col gap-2">
+			<p class="text-lg text-center">Dogs</p>
+			{#each dog_images as image, index}
+				<div>
+					<img src="{PUBLIC_STORAGE_BASE_URL}/{image.id}" alt="Dog image {index}" class="image" />
+					<p>{new Date(image.created_at + 'Z').toLocaleString()}</p>
+				</div>
+			{/each}
+		</div>
 	</div>
 </div>

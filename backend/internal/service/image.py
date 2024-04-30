@@ -7,9 +7,10 @@ import requests
 from sqlalchemy.orm import Session
 
 from internal.db import image as db_image
-from internal.db.models import Image
+from internal.db.models import Image, AnimalType
 from internal.logging import get_logger
 from internal.service.exception import DBException, ExternalAPIException
+from internal.service.image_classifier import classify_image
 from internal.service.utils import save_image_cloud
 from internal.settings import settings
 
@@ -21,8 +22,9 @@ last_retrieve_at: datetime = datetime.utcnow()
 def retrieve_image(db: Session):
     global last_retrieve_at
     image_data = _fetch_image_data()
+    image_type = classify_image(image_data)
     image_id = _save_image_to_cloud(image_data)
-    _create_image_record(db, image_id)
+    _create_image_record(db, image_id, image_type)
     last_retrieve_at = datetime.utcnow()
 
 
@@ -48,10 +50,10 @@ def _save_image_to_cloud(image_data):
         raise ExternalAPIException(detail=str(e))
 
 
-def _create_image_record(db: Session, image_id: str):
+def _create_image_record(db: Session, image_id: str, image_type: AnimalType):
     logger.debug("Creating image record in database")
     try:
-        db_image.create_image(db, image_id)
+        db_image.create_image(db, image_id, image_type)
     except Exception as e:
         logger.error(f"Failed to create image record: {str(e)}")
         raise DBException(detail=str(e))
@@ -59,12 +61,13 @@ def _create_image_record(db: Session, image_id: str):
 
 def get_latest_images(
     db: Session, limit: int | None = None
-) -> tuple[list[Type[Image]], int, datetime]:
+) -> tuple[list[Type[Image]], list[Type[Image]], int, datetime]:
     logger.debug("Getting latest images from the database")
     try:
-        images = db_image.get_latest_images(db, limit)
+        cat_images = db_image.get_latest_images(db, AnimalType.cat, limit)
+        dog_images = db_image.get_latest_images(db, AnimalType.dog, limit)
         total_images = db_image.get_total_images(db)
     except Exception as e:
         logger.exception("Error fetching images")
         raise DBException(detail=str(e))
-    return images, total_images, last_retrieve_at
+    return cat_images, dog_images, total_images, last_retrieve_at
